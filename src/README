@@ -1,0 +1,59 @@
+********************************************************************************
+*                               PCONS                                          *
+* Calculates structral consensus for all models in a specified directory       *
+*                                                                              *
+* Reference: Bjorn Wallner and Arne Elofsson, Protein Sci., 2006 15(4):900-913 *
+* For comments, please email to: bjorn@sbc.su.se                               *
+*                                                                              *
+* If the program Seg. faults make sure the stacksize is unlimited:             *
+* bash: ulimit -s unlimited                                                    *
+* tcsh: limit stacksize unlimited                                              *
+*                                                                              *
+********************************************************************************
+
+
+INSTALLATION
+============
+The package contains a compiled binary in PCONS/bin/
+
+If you like to recompile just do 'make' in the PCONS/ directory
+
+If you have a 64 bit machine you will get some warnings but it still works...
+
+Before you run the program you need to set the stacksize to unlimited.
+
+In bash (with $ as the prompt):
+	$ ulimit -s unlimited 
+In tcsh
+	$ limit stacksize unlimited  
+
+You could add this to your .bashrc or .tschrc.
+
+
+RUNNING
+=======
+
+Usage: pcons    -d <directory w/ models>
+                -i <inputfile containing full path to models (one one each line) OBS the filenames w/o path must by unique>
+                -casp <output local rmsd as local quality (default is average local S-score)>
+                -lgscore <output average LGscore as global quality measure (default is average S-score)>
+                -L <target sequence length. default: longest sequence in the set>
+                -t <target id, default: will look for T0XXX in the beginning of filenames >
+
+
+Pcons can take two types of input:
+	1) a directory with pdbfiles
+	2) a list of pdbfiles
+
+Normally you don't want to compare models from the same method to tell
+pcons which method a model is from you should add AUTHOR to the
+beginning of your pdbfile.
+
+If the AUTHOR field is missing, pcons will compare that model to all
+other models.
+
+The output is a CASP quality assessment format: PFRMAT QA in QMODE 2.
+
+Example
+$ bin/pcons -d small_set/
+
