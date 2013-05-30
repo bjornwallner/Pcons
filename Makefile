@@ -8,7 +8,7 @@ LFLAG=-O3 -Isrc/ -fopenmp -std=c99
 #LFLAG=-g -lm -Isrc/ 
 
 MAIN: $(MAIN)
-	$(CC) $(LFLAG) -o bin/pcons.openmp $(MAIN) -lm
+	$(CC) $(LFLAG) -o bin/pcons $(MAIN) -lm
 
 
 pcons.o: src/pcons.c
