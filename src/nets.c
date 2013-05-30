@@ -44,7 +44,9 @@ int read_net(char* filename,network* net)
 	  }
 	  else if(strcmp("nhidden",buff)==0)
 	    {
-	      fscanf(fp,"%d",&net->nhidden);
+	      if(fscanf(fp,"%d",&net->nhidden)!=1) {
+		fprintf(stderr,"error reading nhidden\n");
+	      }
 	      
 	    }
 	  else if(strcmp("nout",buff)==0)
