@@ -562,7 +562,7 @@ int main(int argc,char *argv[])             /* Main routine */
 #endif
 
   
-#pragma omp parallel for firstprivate(rank_weight1,rank_weight2) shared(Sstr,sim_mat,LG_average,LG_average1,S_average,S_average1,number_of_comparisons,number_of_comparisons1,rank,dm)// private(LG)
+#pragma omp parallel for default(shared) firstprivate(rank_weight1,rank_weight2) shared(Sstr,sim_mat,LG_average,LG_average1,S_average,S_average1,number_of_comparisons,number_of_comparisons1,rank,dm) schedule(dynamic)// private(LG)
        for(int i=0;i<files;i++)
 	{
 //#ifdef _OPENMP
