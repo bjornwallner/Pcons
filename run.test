@@ -1,0 +1,3 @@
+#!/bin/bash 
+bin/pcons -i list > test.results
+diff test.results expected.test.results
