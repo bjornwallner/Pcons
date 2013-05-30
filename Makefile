@@ -23,3 +23,6 @@ lgscore.o: src/lgscore.c src/lgscore.h
 
 .c.o:	
 	$(CC) -c $(LFLAG) $(CCFLAG)  $*.c -lm
+
+clean: 
+       rm -rf *.o 
