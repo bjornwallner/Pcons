@@ -896,6 +896,8 @@ void LGscore_res(char* file1,char* file2,lgscore *LG, double d0, double minsim,i
   arglist=FALSE;
   fraction_flag=FALSE; //TRUE; //FALSE;
   b_flag=FALSE;
+  align_flag=FALSE;
+  
 
   /* Parse command line for PDB files and options */
   i=1;
@@ -1189,7 +1191,7 @@ void LGscore_res(char* file1,char* file2,lgscore *LG, double d0, double minsim,i
   LG[0].maxatoms=maxatoms1;
   LG[0].maxrms=maxrms1;
   LG[0].maxscore=maxscore1;
-  LG[0].maxpvalue=maxpvalue;
+  LG[0].maxpvalue=maxpvalue1;
 
   //printf("SCORE:\t%d\t%d\t%.1f\t%.1f\t%e\t%e\t%7.5lf\n",length,maxatoms1,maxrms1,maxscore1,maxpvalue1,ss,LG[0].LGscore);
  
@@ -1289,14 +1291,11 @@ void rms(dyn_molecule *m1,dyn_molecule *m2,lgscore *LG, double d0)
  
     //printf("Hello1\n");
     //return;
+    
     copymolecule(&m[0],m1); //copies only the CA...
     copymolecule(&m[1],m2);
     copymolecule(&m[2],m1);
-
-
-  
-  
-
+    
 
   
     //printf("Hello2\n");
@@ -1432,9 +1431,10 @@ void rms(dyn_molecule *m1,dyn_molecule *m2,lgscore *LG, double d0)
 
 
 void LGscore_res_pt(dyn_molecule *m1,dyn_molecule *m2,lgscore *LG, double d0, double minsim,int L,double factor,int step)
-  {
+{
   
-    molecule	m[3];		/* Molecules to be compared */
+  //molecule	m[3];		/* Molecules to be compared */
+    molecule *m;
     int		out_flag;
     //    int superimpose_all;
     int		b_flag;		
@@ -1502,6 +1502,7 @@ void LGscore_res_pt(dyn_molecule *m1,dyn_molecule *m2,lgscore *LG, double d0, do
     short_flag=FALSE;
     arglist=FALSE;
     fraction_flag=FALSE; //TRUE; //FALSE;
+    align_flag=FALSE;
 
     /* Parse command line for PDB files and options */
     i=1;
@@ -1516,18 +1517,23 @@ void LGscore_res_pt(dyn_molecule *m1,dyn_molecule *m2,lgscore *LG, double d0, do
     //{
     maxpvalue=1;
   
- 
+    
     //printf("Hello1\n");
     //return;
+    m=malloc(3*sizeof(molecule));
+    // BW: this is stupied... but the old code deletes everything that 
+    // is not the same in both, so before that is rewritten it has to 
+    // be copied to keep the original...
     copymolecule(&m[0],m1); //copies only the CA...
     copymolecule(&m[1],m2);
     copymolecule(&m[2],m1);
 
-
+   
   
   
-
-
+    //printf("Hello1\n");
+    //return;
+ 
   
     //printf("Hello2\n");
     //if(arglist)
@@ -1809,7 +1815,7 @@ void LGscore_res_pt(dyn_molecule *m1,dyn_molecule *m2,lgscore *LG, double d0, do
   // printf("%d \n",LG[0].residues);
   //exit(1);
   LG[0].LGscore=log10(1/maxpvalue1);
-
+  
   //printf("Ssum: %8.5lf over %d residues gives a mean of %8.5lf\n",Ssum,m[2].residues,Ssum/m[2].residues);
   //printf("TMsum: %8.5lf over %d residues gives a mean of %8.5lf\n",TMsum,m[2].residues,TMsum/m[2].residues);
   //printf("MAT: %lf %lf %lf\nMAT: %lf %lf %lf\nMAT: %lf %lf %lf\n",s[0][0],s[0][1],s[0][2],s[1][0],s[1][1],s[1][2],s[2][0],s[2][1],s[2][2]);
@@ -1818,7 +1824,7 @@ void LGscore_res_pt(dyn_molecule *m1,dyn_molecule *m2,lgscore *LG, double d0, do
   LG[0].maxatoms=maxatoms1;
   LG[0].maxrms=maxrms1;
   LG[0].maxscore=maxscore1;
-  LG[0].maxpvalue=maxpvalue;
+  LG[0].maxpvalue=maxpvalue1;
 
   //printf("SCORE:\t%d\t%d\t%.1f\t%.1f\t%e\t%e\t%7.5lf\n",length,maxatoms1,maxrms1,maxscore1,maxpvalue1,ss,LG[0].LGscore);
  
@@ -1826,7 +1832,7 @@ void LGscore_res_pt(dyn_molecule *m1,dyn_molecule *m2,lgscore *LG, double d0, do
   // free(Sstr);
   //return Sstr_return;
   //exit(0);
-  
+  free(m);
 }
 
 

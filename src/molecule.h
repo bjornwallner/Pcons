@@ -2,7 +2,7 @@
 #define molecule_h
 #include "types/simple.h"
 #include "nets.h"
-#include <limits.h>
+#include <linux/limits.h>
 #define TRUE		1		/* Boolean definitions */
 #define FALSE		0
 #define	MAXATMS		10000		/* Maximum allowable atoms */

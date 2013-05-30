@@ -18,10 +18,11 @@ typedef struct
   int    resnum[MAXRES];
   int length;
   int maxatoms;
+  int    residues;
   double maxrms;
   double maxscore;
   double maxpvalue;
-  int    residues;
+  
 
 } lgscore;
 
