@@ -38,7 +38,9 @@ int read_net(char* filename,network* net)
 	
 	if(strcmp("nin",buff)==0)
 	  {
-	    fscanf(fp,"%d",&net->nin);
+	    if(fscanf(fp,"%d",&net->nin)!=1) {
+	      fprintf(stderr,"error reading nin\n");
+	    }
 	    
 	    //	    printf("%d",net->nin);
 	  }
@@ -51,7 +53,9 @@ int read_net(char* filename,network* net)
 	    }
 	  else if(strcmp("nout",buff)==0)
 	    {
-	      fscanf(fp,"%d",&net->nout);
+	      if(fscanf(fp,"%d",&net->nout)!=1) {
+		  fprintf(stderr,"error reading nout\n");
+		}
 	    }
 	  else if(strcmp("w1",buff)==0)
 	    {
@@ -60,7 +64,10 @@ int read_net(char* filename,network* net)
 		{
 		  for(i=0;i<net->nhidden;i++)
 		    {
-		      fscanf(fp,"%lf",&net->w1[i][j]); 
+		      if(fscanf(fp,"%lf",&net->w1[i][j])!=1) {
+			fprintf(stderr,"error reading w1[%d][%d]\n",i,j);
+
+		      } 
 		    }
 		}
 	    }
@@ -68,7 +75,10 @@ int read_net(char* filename,network* net)
 	    {
 	      for(i=0;i<net->nhidden;i++)
 		{
-		  fscanf(fp,"%lf",&net->b1[i]);
+		  if(fscanf(fp,"%lf",&net->b1[i])!=1)
+		    {
+		      fprintf(stderr,"error reading b1[%d]\n",i);
+		    }
 		  //printf("%lf ",net->b1[i]);
 		  //		}
 		}
@@ -77,12 +87,16 @@ int read_net(char* filename,network* net)
 	    {
 	      for(i=0;i<net->nhidden;i++)
 		{
-		  fscanf(fp,"%lf",&net->w2[i]);
+		  if(fscanf(fp,"%lf",&net->w2[i])!=1) {
+		    fprintf(stderr,"error reading w2[%d]\n",i);
+		  }
 		}
 	    }
 	  else if(strcmp("b2",buff)==0)
 	    {
-	      fscanf(fp,"%lf",&net->b2);
+	      if(fscanf(fp,"%lf",&net->b2)!=1) {
+		fprintf(stderr,"error reading b2[%d]\n",i);
+	      }
 	    }
 //	  //zprintf("%s\n",buff);
       }
