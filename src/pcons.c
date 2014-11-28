@@ -781,13 +781,20 @@ int main(int argc,char *argv[])             /* Main routine */
 
       //Calculate reweighted pcons scores...
       if(google){
-	  lgscoreoutput=0;
+	//lgscoreoutput=0;
 	  google_weight=malloc(sizeof(double)*files);
 	  pcons_google=malloc(sizeof(double)*files);
 	  pcons_google_previous=malloc(sizeof(double)*files);
 	  for(i=0;i<files;i++) {
+	    if(lgscoreoutput) {
 	      pcons_google_previous[i]=LG_average[i];
+	      pcons_google[i]=LG_average[i];
+	    } else {
+	      pcons_google_previous[i]=S_average[i];
+	      pcons_google[i]=S_average[i];
 	    }
+	    
+	  }
 
 	  for(k=0;k<google_iter;k++){
 	    for(i=0;i<files;i++){
@@ -845,12 +852,17 @@ int main(int argc,char *argv[])             /* Main routine */
 	    }
 	  if(lgscoreoutput)
 	    {
-	      printf("REMARK Global quality estimate is LGscore\n");
+	      if(google)
+	      {
+		printf("REMARK Global quality estimate is reweighted LGscore (google-style, iter=%d, cut=%5.3lf)\n",google_iter,google_weight_cut);
+	      } else {
+		printf("REMARK Global quality estimate is LGscore\n");
+	      }
 	    }
 	  else{
 	    if(google)
 	      {
-		printf("REMARK Global quality estimate is reweighted LGscore (google-style, iter=%d, cut=%5.3lf)\n",google_iter,google_weight_cut);
+		printf("REMARK Global quality estimate is reweighted S-score (google-style, iter=%d, cut=%5.3lf)\n",google_iter,google_weight_cut);
 	      }
 	    else
 	      {
@@ -961,28 +973,17 @@ int main(int argc,char *argv[])             /* Main routine */
 	      //LG_average[i]/=number_of_comparisons[i];
 	      //S_average[i]/=number_of_comparisons[i];
 	      //S_average[i]/=maxlen;
-
-	      if(lgscoreoutput)
-		{
-		  //printf("%s %5.3lf %5.3lf %5.3lf",filenames[i],(1-w1)*LG_average[i]+w1*LG_average1[i],LG_average[i],LG_average1[i]);
-		  printf("%s %5.3lf ",filenames[i],(1-w1)*LG_average[i]+w1*LG_average1[i]);
-		}
-	      else{
-		if(google)
-		  {
-		    printf("%s %5.3lf ",filenames[i],pcons_google[i]);
-		  }
-		else
-		  {
-		    // printf("%s %5.3lf %5.3lf %5.3lf\n",filenames[i],(1-w1)*S_average[i]+w1*S_average1[i],S_average[i],S_average1[i]);
-		    printf("%s %5.3lf ",filenames[i],(1-w1)*S_average[i]+w1*S_average1[i]);
-		    
-		  }
+	      if(google) {
+		printf("%s %5.3lf ",filenames[i],pcons_google[i]);
+	      } else if(lgscoreoutput) {
+		//printf("%s %5.3lf %5.3lf %5.3lf",filenames[i],(1-w1)*LG_average[i]+w1*LG_average1[i],LG_average[i],LG_average1[i]);
+		printf("%s %5.3lf ",filenames[i],(1-w1)*LG_average[i]+w1*LG_average1[i]);
+	      } else {
+		  printf("%s %5.3lf ",filenames[i],(1-w1)*S_average[i]+w1*S_average1[i]);
 	      }
-	      //   printf("%s %5.3lf %5.3lf ",filenames[i],LG_average[i],S_average[i]);
 	      for(j=0;j<maxlen;j++)
-		{
-		  Sstr[i][j]/=number_of_comparisons[i];
+		  {
+		    Sstr[i][j]/=number_of_comparisons[i];
 		  if(Sstr[i][j]>0.0001)
 		    {
 		      //Sstr[i][j]/=number_of_comparisons[i];
@@ -1081,6 +1082,8 @@ void usage()
   fprintf(stderr,"\t\t-A <force compare all targets, by default targets from same method are not compared>\n");
   fprintf(stderr,"\t\t-only_pairwise <will skip the pcons evaluation>\n");
   fprintf(stderr,"\t\t-google  <do a google-like weighting>\n");
+  fprintf(stderr,"\t\t-google_iter  <number of iterations (default=1)>\n");
+  fprintf(stderr,"\t\t-google_weight_cut  <only similarity to models over the cut are considered (default=0)>\n");
   fprintf(stderr,"\t\t-w1 <the final score is (1-w1)*sim_all+w1*sim_first>\n");
   fprintf(stderr,"\t\t-use_rank_weight <weight the average sim with 1/rank>\n");
   fprintf(stderr,"\t\t-rank1 <only compare to first ranked, this will put w1=1 as well and override any setting of w1>\n");
