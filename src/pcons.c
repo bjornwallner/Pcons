@@ -250,7 +250,7 @@ int main(int argc,char *argv[])             /* Main routine */
 		      //tmp=ftell(fp);
 
 			  //filenames[files];
-			  //  printf("%s %s %d %s\n",filenames_with_path[files],filenames[files],files,basename(tempfilename));
+			  //			  printf("%d %s %s %d %s\n",files,filenames_with_path[files],filenames[files],files,basename(tempfilename));
 		      
 
 			  files++;
@@ -326,6 +326,11 @@ int main(int argc,char *argv[])             /* Main routine */
 	    {
 	      i++;
 	      google_weight_cut=atof(argv[i]);
+	    }
+	   if(strcmp(argv[i],"-d0")==0)
+	    {
+	      i++;
+	      d0=atof(argv[i]);
 	    }
 	   if(strcmp(argv[i],"-casp")==0)
 	    {
@@ -873,7 +878,7 @@ int main(int argc,char *argv[])             /* Main routine */
 	  printf("REMARK Total number of comparisons: %d\n",total_number_of_comparisons);
 	  printf("REMARK Total CPU time used: %8.2lf seconds\n",(double)(((double)en_cpu.tms_utime - (double)st_cpu.tms_utime)/100));
 	  printf("REMARK Total time used: %lf seconds\n",ftime);
-	  printf("REMARK LGscore parameters superimpose_all=%d L=%d minsim=%lf factor=%lf step=%d\n",superimpose_all,L,minsim,factor,step);
+	  printf("REMARK LGscore parameters superimpose_all=%d L=%d minsim=%lf factor=%lf step=%d d0=%lf\n",superimpose_all,L,minsim,factor,step,d0);
 	  if(userdef_len>0)
 	    {
 	      printf("REMARK Target sequence length (user defined): %d\n",userdef_len);
@@ -983,7 +988,7 @@ int main(int argc,char *argv[])             /* Main routine */
 	      for(j=0;j<maxlen;j++)
 		{
 		  Sstr[i][j]/=number_of_comparisons[i];
-		  if(Sstr[i][j]>0.0001)
+		  if(Sstr[i][j]!=0) //0.000000001)
 		    {
 		      //Sstr[i][j]/=number_of_comparisons[i];
 		      // Sstr[i][j]/=number_of_comparisons[i];
@@ -1076,6 +1081,7 @@ void usage()
   fprintf(stderr,"\t\t-casp will output local rmsd as local quality (default is average local S-score)\n");
   fprintf(stderr,"\t\t-lgscore will output average LGscore as global quality measure (default is average S-score)\n");
   fprintf(stderr,"\t\t-L <target sequence length. default: longest sequence in the set>\n");
+  fprintf(stderr,"\t\t-d0 <scaling factor in the S-score calculation> default sqrt(5)=2.24\n");
   fprintf(stderr,"\t\t-t <target id, default: will look for T0XXX in the beginning of filenames >\n");
   fprintf(stderr,"\t\t-m <output pairwise similarity matrix to this file, this will force compare all targets against each other>\n");
   fprintf(stderr,"\t\t-A <force compare all targets, by default targets from same method are not compared>\n");

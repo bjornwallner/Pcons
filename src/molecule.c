@@ -147,7 +147,7 @@ int read_molecules_dynamic(dyn_molecule *m,char atomflag,int *ignore_res)	/* Rea
 	      //if (strcmp("N",name)==0)	   /*  Is it an N atom => new residue? */
 		  //printf("%s %d %d\n",m[0].filename,resnum,ignore_res[resnum]);
 		  //		  printf("%d %d\n",residues,ignore_res[0]); 
-		  if(ignore_res[resnum]!=1) 
+		  if(ignore_res[resnum]==0) 
 		    {
 		    if(strcmp(old_resname,resname)!=0)
 		      {
