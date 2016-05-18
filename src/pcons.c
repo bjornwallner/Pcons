@@ -989,7 +989,8 @@ int main(int argc,char *argv[])             /* Main routine */
 	      for(j=0;j<maxlen;j++)
 		{
 		  Sstr[i][j]/=number_of_comparisons[i];
-		  if(Sstr[i][j]!=0) //0.000000001)
+		  // if this is used it will enter the loop if we have nan  if(Sstr[i][j]!=0) //0.000000001)
+		    if(Sstr[i][j] > 0.0000000001) //0.000000001)
 		    {
 		      //Sstr[i][j]/=number_of_comparisons[i];
 		      // Sstr[i][j]/=number_of_comparisons[i];
