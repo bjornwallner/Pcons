@@ -590,7 +590,7 @@ int main(int argc,char *argv[])             /* Main routine */
 	      
 	      //	      if((dm[i].method==NULL || dm[j].method==NULL) && (force_compare_all || !SameMethod(filenames[i],filenames[j])) ||
 	      //	 (dm[i].method!=NULL && dm[j].method!=NULL) && (force_compare_all || strcmp(dm[i].method,dm[j].method)!=0))
-
+	      //	      printf("%s %s %d %d same:%d\n",filenames[i],filenames[j],dm[i].residues,dm[j].residues,SameMethod(filenames[i],filenames[j]));
 	      if(dm[i].residues>0 && dm[j].residues>0) {
 		if(force_compare_all || !SameMethod(filenames[i],filenames[j]))
 		  {
@@ -711,15 +711,17 @@ int main(int argc,char *argv[])             /* Main routine */
 			  Sstr[j][LG[0].resnum[k]-1]+=rank_weight2*LG[0].S[k];
 			}
 		    }
-		    else
-		      {
-			if(verbose)
-			  {
-			    printf("Does not compare %s %s SameMethod: %d\n",filenames[i],filenames[j],SameMethod(filenames[i],filenames[j]));
-			  }
-		      }
-
 		  }
+		else
+		  {
+		    if(verbose)
+		      {
+			printf("Does not compare %s %s SameMethod: %d\n",filenames[i],filenames[j],SameMethod(filenames[i],filenames[j]));
+		      }
+		  }
+	      } else {
+		if(verbose)
+		  printf("Skip at least one of the has no residues %s %s\n",filenames[i],filenames[j]);
 	      }
 	    }
 	  if(output_similarity_matrix)
@@ -780,7 +782,7 @@ int main(int argc,char *argv[])             /* Main routine */
 		S_average1[i]/=maxlen;
 	      }
 	    }
-	  //	  printf("%lf %lf %d\n",S_average1[i],number_of_comparisons1[i],maxlen);
+	  //	  printf("%s %lf %lf %d\n",filenames[i],S_average[i],number_of_comparisons[i],maxlen);
 	}
 
 
@@ -988,10 +990,11 @@ int main(int argc,char *argv[])             /* Main routine */
 	      }
 	      for(j=0;j<maxlen;j++)
 		{
-		  Sstr[i][j]/=number_of_comparisons[i];
+		 
 		  // if this is used it will enter the loop if we have nan  if(Sstr[i][j]!=0) //0.000000001)
-		    if(Sstr[i][j] > 0.0000000001) //0.000000001)
+		  if(Sstr[i][j] != 0 ) //> 0.0000000001) //0.000000001)
 		    {
+		      Sstr[i][j]/=number_of_comparisons[i];
 		      //Sstr[i][j]/=number_of_comparisons[i];
 		      // Sstr[i][j]/=number_of_comparisons[i];
 		      if(caspoutput==1)
