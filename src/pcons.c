@@ -8,9 +8,6 @@
 #include <time.h>
 #include <limits.h>
 #include <math.h>
-#ifdef _OPENMP		      
-#include <omp.h>
-#endif
 //#include "/work/bjornw/source/c/pdb/molecule.h"
 //#include "/work/bjornw/source/c/pdb/quality_measure/lgscore.h"
 //#include "/afs/pdc.kth.se/home/b/bjornw/source/c/pdb/molecule.h"
@@ -27,7 +24,7 @@ int Rank(char *file);
 int ispdb(char *filename);
 char *basename(char *fname);
 
-int main(int argc,char *argv[])             /* Main routine */
+main(int argc,char *argv[])             /* Main routine */
 {
   DIR            *dip;
   FILE           *fp;
@@ -36,11 +33,13 @@ int main(int argc,char *argv[])             /* Main routine */
   char           file2[PATH_MAX];
   char           tempfilename[PATH_MAX]="";
   char           infilename[PATH_MAX]="";
+  char           weightfile[PATH_MAX]="";
   char           matrix_outfile[PATH_MAX]="";
   int            rank[MAXFILE];
+  double            weights[MAXFILE]={};
   // char           filenames[MAXFILE][100];
-  char           *filenames_with_path[MAXFILE]={NULL}; //[PATH_MAX];
-  char           *filenames[MAXFILE]={NULL}; //[MAXFILE][100];
+  char           *filenames_with_path[MAXFILE]; //[PATH_MAX];
+   char           *filenames[MAXFILE]; //[MAXFILE][100];
    // char           **filenames; //[MAXFILE]; //[MAXFILE][100];
   //char           **filenames_with_path='\0';//[MAXFILE][STRING_BUFFER];
   int            i,j,k,l;
@@ -54,20 +53,15 @@ int main(int argc,char *argv[])             /* Main routine */
   double         rank_weight1=1.0;
   double         rank_weight2=1.0;
   char           temp[PATH_MAX];
-  //  lgscore        LG[1];
+  lgscore        LG[1];
   //  double         LG_average[MAXFILE]={0};
   //double         S_average[MAXFILE]={0};
   //double         Sstr[MAXFILE][MAXRES]={{0}};
   //  int            number_of_comparisons[MAXFILE]={0};
-
-	  
   double         *LG_average,*S_average,*LG_average1,*S_average1,*pcons_google,*pcons_google_previous,*google_weight;
   double          **Sstr,**sim_mat;
-  // double          **sim_mat;
-  //double *Sstr[MAXFILE]={NULL};
   double            *number_of_comparisons,*number_of_comparisons1;
   int            total_number_of_comparisons=0;
-  int nofree=0;
   int            maxlen=0;
   int            normL=1;
   int            userdef_len=-1;
@@ -78,6 +72,7 @@ int main(int argc,char *argv[])             /* Main routine */
   char          target[STRING_BUFFER]="T0XXX";
   int           int_buffer;
   int           max_int;
+  int           direct_rank_weighting=0;
   int           verbose=0;
   int           fastmode=0;
   int           memorymode=1;
@@ -110,7 +105,8 @@ int main(int argc,char *argv[])             /* Main routine */
   //i=1;
   
   
-  
+  for(j=0;j<MAXFILE;j++)
+    weights[j]=1;
 
   //printf("%d %d %d %d\n",sizeof(dm),sizeof(dyn_molecule),sizeof(atm),sizeof(double));
   //exit(0);
@@ -182,6 +178,7 @@ int main(int argc,char *argv[])             /* Main routine */
 //}
 			  
 			  rank[files]=Rank(filenames[files]);
+			  
 			  //strncpy_NULL(filenames_with_path[files],tempfilename,(strlen(tempfilename)));
 			  strcpy(filenames_with_path[files],tempfilename);
 			  //			   printf("%s %d\n",filenames[files],rank[files]);
@@ -214,6 +211,34 @@ int main(int argc,char *argv[])             /* Main routine */
 		  return 0;
 		}
 	    }
+	  if(strcmp(argv[i],"-w")==0)
+	    {
+	      i++;
+	      
+	      strcpy(weightfile,argv[i]);
+	      // printf("%s\n",infilename);
+	      fp=fopen(weightfile,"r");
+	      if(fp!=NULL)
+		{
+		  j=0;
+		
+		  while(fscanf(fp,"%lf",&weights[j])!=EOF)
+		    {
+		      
+		      //   printf("%lf\n",weights[j]);
+		      j++;
+		    }
+		}
+	      else
+		{
+		    printf("Cannot open %s",weightfile);
+		    exit(0);
+		}	
+	      if(files != j) {
+		printf("Number of lines in %s and %s are different (%d vs. %d)\n",infilename,weightfile,files,j);
+		exit(0);
+	      }
+	    }
 	  if(strcmp(argv[i],"-i")==0)
 	    {
 	      i++;
@@ -231,7 +256,6 @@ int main(int argc,char *argv[])             /* Main routine */
 		      //printf("%s %d\n",tempfilename,strlen(tempfilename));
 		      if(ispdb(tempfilename))
 			{
-
 			  filenames[files]=(char*)realloc(filenames[files],sizeof(char)*PATH_MAX); //(strlen(dit->d_name)+1));
 			  filenames_with_path[files]=(char*)realloc(filenames_with_path[files],sizeof(char)*PATH_MAX);
 			  
@@ -250,7 +274,7 @@ int main(int argc,char *argv[])             /* Main routine */
 		      //tmp=ftell(fp);
 
 			  //filenames[files];
-			  //			  printf("%d %s %s %d %s\n",files,filenames_with_path[files],filenames[files],files,basename(tempfilename));
+			  //  printf("%s %s %d %s\n",filenames_with_path[files],filenames[files],files,basename(tempfilename));
 		      
 
 			  files++;
@@ -308,6 +332,10 @@ int main(int argc,char *argv[])             /* Main routine */
 	     {
 	       force_compare_all=1;
 	     }
+	   if(strcmp(argv[i],"-direct_rank_weighting")==0)
+	     {
+	       direct_rank_weighting=1;
+	     }
 	   if(strcmp(argv[i],"-only_pairwise")==0)
 	     {
 	       only_pairwise=1;
@@ -326,11 +354,6 @@ int main(int argc,char *argv[])             /* Main routine */
 	    {
 	      i++;
 	      google_weight_cut=atof(argv[i]);
-	    }
-	   if(strcmp(argv[i],"-d0")==0)
-	    {
-	      i++;
-	      d0=atof(argv[i]);
 	    }
 	   if(strcmp(argv[i],"-casp")==0)
 	    {
@@ -363,11 +386,7 @@ int main(int argc,char *argv[])             /* Main routine */
 	      rank1=1;
 	      //	      w1=1;
 	    }
-	    if(strcmp(argv[i],"-nofree")==0)
-	    {
-	      nofree=1;
-	      //	      w1=1;
-	    }
+	  
 	   if(strcmp(argv[i],"-normL")==0)
 	    {
 	       normL=1;
@@ -502,7 +521,7 @@ int main(int argc,char *argv[])             /* Main routine */
 
       //ignore_res
 
-    
+     
       
       
       //  for(i=0;i<=maxlen;i++)
@@ -560,37 +579,22 @@ int main(int argc,char *argv[])             /* Main routine */
 	      exit(0);
 	    }
 	}
-#ifdef _OPENMP
-      double stime=omp_get_wtime();
-#else 
-      double stime=(double)clock() / (double)CLOCKS_PER_SEC;
-#endif
 
-  
-#pragma omp parallel for default(shared) firstprivate(rank_weight1,rank_weight2) shared(Sstr,sim_mat,LG_average,LG_average1,S_average,S_average1,number_of_comparisons,number_of_comparisons1,rank,dm) schedule(dynamic)// private(LG)
-       for(int i=0;i<files;i++)
+
+      for(i=0;i<files;i++)
 	{
-//#ifdef _OPENMP
-//int threads = omp_get_num_threads();
-//#else
-//int threads = 1
-//#endif
-//	  printf("Running on %d threads...\n",threads);
-	  lgscore LG[1];
-	  //	  lgscore *LG;
-	  //LG=malloc(sizeof(lgscore));
 	  if(verbose)
 	    printf("%d / %d\n",i+1,files+1);
 	  if(output_similarity_matrix)
 	    fprintf(fp,"%-40s ",filenames[i]);
 	  
-	  for(int j=i+1;j<files;j++)
+	  for(j=i+1;j<files;j++)
 	    {
 	      // printf("%s %s %s %s %d %d same:%d\n",dm[i].method,dm[j].method,filenames[i],filenames[j],i,j,!SameMethod(filenames[i],filenames[j]));
 	      
 	      //	      if((dm[i].method==NULL || dm[j].method==NULL) && (force_compare_all || !SameMethod(filenames[i],filenames[j])) ||
 	      //	 (dm[i].method!=NULL && dm[j].method!=NULL) && (force_compare_all || strcmp(dm[i].method,dm[j].method)!=0))
-	      //	      printf("%s %s %d %d same:%d\n",filenames[i],filenames[j],dm[i].residues,dm[j].residues,SameMethod(filenames[i],filenames[j]));
+
 	      if(dm[i].residues>0 && dm[j].residues>0) {
 		if(force_compare_all || !SameMethod(filenames[i],filenames[j]))
 		  {
@@ -601,11 +605,27 @@ int main(int argc,char *argv[])             /* Main routine */
 		    rank_weight2=1;
 		    if(use_rank_weight)
 		      {
-			//The weight is reversed... I think...
-			rank_weight1=1/(double)(rank[j]);
-			rank_weight2=1/(double)(rank[i]);
+			if(direct_rank_weighting) {
+			  
+			  rank_weight1=1/(double)(rank[i]);
+			  rank_weight2=1/(double)(rank[j]);
+			} else {
+			  //The weight is reversed... I think...
+			  rank_weight1=1/(double)(rank[j]);
+			  rank_weight2=1/(double)(rank[i]);
+			}
 			//  printf("%f %d %f %d\n",rank_weight1,rank[j],rank_weight2,rank[i]);
 		      }
+		    if(strlen(weightfile)>0) {
+		      if(direct_rank_weighting) {
+			rank_weight1=rank_weight1*weights[i];
+			rank_weight2=rank_weight2*weights[j];
+		      } else {
+			rank_weight1=rank_weight1*weights[j];
+			rank_weight2=rank_weight2*weights[i];
+		      }
+		    }
+		    
 		    if(rank1) {
 		      
 		      rank_weight1=0;
@@ -637,29 +657,19 @@ int main(int argc,char *argv[])             /* Main routine */
 		    
 		      sim_mat[i][j]=LG[0].LGscore;
 		      sim_mat[j][i]=LG[0].LGscore;
-#pragma omp atomic
 		      LG_average[i]+=rank_weight1*LG[0].LGscore;
-#pragma omp atomic
-
 		      LG_average[j]+=rank_weight2*LG[0].LGscore;
-#pragma omp atomic
 		      S_average[i]+=rank_weight1*LG[0].Ssum;
-#pragma omp atomic
 		      S_average[j]+=rank_weight2*LG[0].Ssum;
-#pragma omp atomic
+		      
 		      number_of_comparisons[i]+=rank_weight1;
-#pragma omp atomic
-
 		      number_of_comparisons[j]+=rank_weight2;
 		      
 		      if(rank[i]==1)
 			{
 			//  printf("%d %s %s %8.3f %e\n",i,filenames[i],filenames[j],LG[0].LGscore,pow(10,-LG[0].LGscore));
-#pragma omp atomic
 			  LG_average1[j]+=rank_weight2*LG[0].LGscore;
-#pragma omp atomic
 			  S_average1[j]+=rank_weight2*LG[0].Ssum;
-#pragma omp atomic
 			  number_of_comparisons1[j]+=rank_weight2;
 			}
 		      
@@ -667,18 +677,15 @@ int main(int argc,char *argv[])             /* Main routine */
 			{
 			  //  printf("%d %s %s\n",j,filenames[j],filenames[i]);
 			  //printf("%d %s %s %8.3f %e \n",j,filenames[j],filenames[i],LG[0].LGscore,pow(10,-LG[0].LGscore));
-#pragma omp atomic
 			  LG_average1[i]+=rank_weight1*LG[0].LGscore;
-#pragma omp atomic
 			  S_average1[i]+=rank_weight1*LG[0].Ssum;
-#pragma omp atomic
 			  number_of_comparisons1[i]+=rank_weight1;
 			}
 		      
-#pragma omp atomic
+		      
 		      total_number_of_comparisons++;
 		      if(verbose)
-			printf("%d Comparing2 %s %s %s %s %lf %lf %lf %lf %lf %lf\n",total_number_of_comparisons,filenames[i],filenames[j],dm[i].filename,dm[j].filename,LG[0].LGscore,LG[0].Ssum,S_average1[i],S_average1[j],rank_weight1,rank_weight2);
+			printf("%d Comparing2 %s %s %s %s %lf %lf %lf %lf %lf %lf %lf %lf\n",total_number_of_comparisons,filenames[i],filenames[j],dm[i].filename,dm[j].filename,LG[0].LGscore,LG[0].Ssum,S_average1[i],S_average1[j],rank_weight1,rank_weight2,weights[i],weights[j]);
 		    
 		    //if(strcmp(filenames[i],"
 		    
@@ -687,8 +694,7 @@ int main(int argc,char *argv[])             /* Main routine */
 		    //    maxlen=LG[0].residues;
 		    //  }
 		    // In the case of CASP I can assume that the resnum is the correct index
-		      //#pragma omp parallel for firstprivate(rank_weight1, rank_weight2) schedule(auto)
-		      for(int k=0;k<LG[0].residues;k++)
+		      for(k=0;k<LG[0].residues;k++)
 			{
 			  //   printf("%d %d\n",k+1,LG[0].resnum[k]);
 			  //  if(i==97 || j==97 ) { 
@@ -705,39 +711,24 @@ int main(int argc,char *argv[])             /* Main routine */
 			  //}
 			  
 			  //	printf("%d %s %s %lf\n",k,filenames[i],filenames[j],rank_weight1);
-#pragma omp atomic
 			  Sstr[i][LG[0].resnum[k]-1]+=rank_weight1*LG[0].S[k];
-#pragma omp atomic
 			  Sstr[j][LG[0].resnum[k]-1]+=rank_weight2*LG[0].S[k];
 			}
 		    }
-		  }
-		else
-		  {
-		    if(verbose)
+		    else
 		      {
-			printf("Does not compare %s %s SameMethod: %d\n",filenames[i],filenames[j],SameMethod(filenames[i],filenames[j]));
+			if(verbose)
+			  {
+			    printf("Does not compare %s %s SameMethod: %d\n",filenames[i],filenames[j],SameMethod(filenames[i],filenames[j]));
+			  }
 		      }
+
 		  }
-	      } else {
-		if(verbose)
-		  printf("Skip at least one of the has no residues %s %s\n",filenames[i],filenames[j]);
 	      }
 	    }
 	  if(output_similarity_matrix)
 	    fprintf(fp,"\n");
-	  //	  free(LG);
 	}
-#pragma omp barrier
-
-#ifdef _OPENMP
-       double ftime=omp_get_wtime()-stime;
-#else 
-       double ftime=(double)clock() / (double)CLOCKS_PER_SEC-stime;
-#endif
-
-
-       //}
       if(output_similarity_matrix)
 	{
 	  fprintf(fp,"END\n");
@@ -782,26 +773,20 @@ int main(int argc,char *argv[])             /* Main routine */
 		S_average1[i]/=maxlen;
 	      }
 	    }
-	  //	  printf("%s %lf %lf %d\n",filenames[i],S_average[i],number_of_comparisons[i],maxlen);
+	  //	  printf("%lf %lf %d\n",S_average1[i],number_of_comparisons1[i],maxlen);
 	}
+
 
 
       //Calculate reweighted pcons scores...
       if(google){
-	//lgscoreoutput=0;
+	  lgscoreoutput=0;
 	  google_weight=malloc(sizeof(double)*files);
 	  pcons_google=malloc(sizeof(double)*files);
 	  pcons_google_previous=malloc(sizeof(double)*files);
 	  for(i=0;i<files;i++) {
-	    if(lgscoreoutput) {
 	      pcons_google_previous[i]=LG_average[i];
-	      pcons_google[i]=LG_average[i];
-	    } else {
-	      pcons_google_previous[i]=S_average[i];
-	      pcons_google[i]=S_average[i];
 	    }
-	    
-	  }
 
 	  for(k=0;k<google_iter;k++){
 	    for(i=0;i<files;i++){
@@ -827,9 +812,7 @@ int main(int argc,char *argv[])             /* Main routine */
 	      }
 	  }
 	  // exit(1);
-	  free(google_weight);
-	  free(pcons_google);
-	  free(pcons_google_previous);
+	  
 	}
 
 
@@ -849,6 +832,9 @@ int main(int argc,char *argv[])             /* Main routine */
 
 	    printf("REMARK Residues in the file: \'%s\' were ignored in the calculation\n",ignore_res_file);
 	  }
+	  if(strlen(weightfile)>0) {
+	    printf("REMARK Average is weighted by the values in file:'%s'\n",weightfile);
+	  }
 	  if(caspoutput)
 	    {
 	      printf("REMARK Error estimate is CA-CA rms distance in Angstroms\n");
@@ -859,17 +845,12 @@ int main(int argc,char *argv[])             /* Main routine */
 	    }
 	  if(lgscoreoutput)
 	    {
-	      if(google)
-	      {
-		printf("REMARK Global quality estimate is reweighted LGscore (google-style, iter=%d, cut=%5.3lf)\n",google_iter,google_weight_cut);
-	      } else {
-		printf("REMARK Global quality estimate is LGscore\n");
-	      }
+	      printf("REMARK Global quality estimate is LGscore\n");
 	    }
 	  else{
 	    if(google)
 	      {
-		printf("REMARK Global quality estimate is reweighted S-score (google-style, iter=%d, cut=%5.3lf)\n",google_iter,google_weight_cut);
+		printf("REMARK Global quality estimate is reweighted LGscore (google-style, iter=%d, cut=%5.3lf)\n",google_iter,google_weight_cut);
 	      }
 	    else
 	      {
@@ -891,8 +872,7 @@ int main(int argc,char *argv[])             /* Main routine */
 	  printf("REMARK Total number of pdbs: %d\n",files);
 	  printf("REMARK Total number of comparisons: %d\n",total_number_of_comparisons);
 	  printf("REMARK Total CPU time used: %8.2lf seconds\n",(double)(((double)en_cpu.tms_utime - (double)st_cpu.tms_utime)/100));
-	  printf("REMARK Total time used: %lf seconds\n",ftime);
-	  printf("REMARK LGscore parameters superimpose_all=%d L=%d minsim=%lf factor=%lf step=%d d0=%lf\n",superimpose_all,L,minsim,factor,step,d0);
+	  printf("REMARK LGscore parameters superimpose_all=%d L=%d minsim=%lf factor=%lf step=%d\n",superimpose_all,L,minsim,factor,step);
 	  if(userdef_len>0)
 	    {
 	      printf("REMARK Target sequence length (user defined): %d\n",userdef_len);
@@ -980,21 +960,30 @@ int main(int argc,char *argv[])             /* Main routine */
 	      //LG_average[i]/=number_of_comparisons[i];
 	      //S_average[i]/=number_of_comparisons[i];
 	      //S_average[i]/=maxlen;
-	      if(google) {
-		printf("%s %5.3lf ",filenames[i],pcons_google[i]);
-	      } else if(lgscoreoutput) {
-		//printf("%s %5.3lf %5.3lf %5.3lf",filenames[i],(1-w1)*LG_average[i]+w1*LG_average1[i],LG_average[i],LG_average1[i]);
-		printf("%s %5.3lf ",filenames[i],(1-w1)*LG_average[i]+w1*LG_average1[i]);
-	      } else {
-		  printf("%s %5.3lf ",filenames[i],(1-w1)*S_average[i]+w1*S_average1[i]);
+
+	      if(lgscoreoutput)
+		{
+		  //printf("%s %5.3lf %5.3lf %5.3lf",filenames[i],(1-w1)*LG_average[i]+w1*LG_average1[i],LG_average[i],LG_average1[i]);
+		  printf("%s %5.3lf ",filenames[i],(1-w1)*LG_average[i]+w1*LG_average1[i]);
+		}
+	      else{
+		if(google)
+		  {
+		    printf("%s %5.3lf ",filenames[i],pcons_google[i]);
+		  }
+		else
+		  {
+		    // printf("%s %5.3lf %5.3lf %5.3lf\n",filenames[i],(1-w1)*S_average[i]+w1*S_average1[i],S_average[i],S_average1[i]);
+		    printf("%s %5.3lf ",filenames[i],(1-w1)*S_average[i]+w1*S_average1[i]);
+		    
+		  }
 	      }
+	      //   printf("%s %5.3lf %5.3lf ",filenames[i],LG_average[i],S_average[i]);
 	      for(j=0;j<maxlen;j++)
 		{
-		 
-		  // if this is used it will enter the loop if we have nan  if(Sstr[i][j]!=0) //0.000000001)
-		  if(Sstr[i][j] != 0 ) //> 0.0000000001) //0.000000001)
+		  Sstr[i][j]/=number_of_comparisons[i];
+		  if(Sstr[i][j]>0.0001)
 		    {
-		      Sstr[i][j]/=number_of_comparisons[i];
 		      //Sstr[i][j]/=number_of_comparisons[i];
 		      // Sstr[i][j]/=number_of_comparisons[i];
 		      if(caspoutput==1)
@@ -1031,33 +1020,27 @@ int main(int argc,char *argv[])             /* Main routine */
 	}
 
       //Freeing up some allocated memory
-      if(nofree) {
-	exit(1);
-      }
+     
       bytes_freed=0;
       for(i=0;i<files;i++)
 	 {
-	   // printf("%d\n",i); 
-	   free_dyn_molecule(&dm[i]);
+	   //printf("%d\n",i); 
+	  free_dyn_molecule(&dm[i]);
 	  //printf("%lf \n",Sstr[i][0]);
-	   free(Sstr[i]);
-	   free(sim_mat[i]);
-	   free(filenames[i]);
-	   free(filenames_with_path[i]);
+	  free(Sstr[i]);
+	  free(sim_mat[i]);
+	  free(filenames[i]);
+	  free(filenames_with_path[i]);
 	 }
 // free(ignore_res);
       free(Sstr);
       free(sim_mat);
       free(LG_average);
       free(S_average);
-      free(LG_average1);
-      free(S_average1);
-      free(number_of_comparisons);
-      free(number_of_comparisons1);
       free(dm);
 
-    
-    }
+
+}
   else
     {
       usage();
@@ -1086,20 +1069,18 @@ void usage()
   fprintf(stderr,"\t\t-casp will output local rmsd as local quality (default is average local S-score)\n");
   fprintf(stderr,"\t\t-lgscore will output average LGscore as global quality measure (default is average S-score)\n");
   fprintf(stderr,"\t\t-L <target sequence length. default: longest sequence in the set>\n");
-  fprintf(stderr,"\t\t-d0 <scaling factor in the S-score calculation> default sqrt(5)=2.24\n");
   fprintf(stderr,"\t\t-t <target id, default: will look for T0XXX in the beginning of filenames >\n");
   fprintf(stderr,"\t\t-m <output pairwise similarity matrix to this file, this will force compare all targets against each other>\n");
   fprintf(stderr,"\t\t-A <force compare all targets, by default targets from same method are not compared>\n");
   fprintf(stderr,"\t\t-only_pairwise <will skip the pcons evaluation>\n");
   fprintf(stderr,"\t\t-google  <do a google-like weighting>\n");
-  fprintf(stderr,"\t\t-google_iter  <number of iterations (default=1)>\n");
-  fprintf(stderr,"\t\t-google_weight_cut  <only similarity to models over the cut are considered (default=0)>\n");
   fprintf(stderr,"\t\t-w1 <the final score is (1-w1)*sim_all+w1*sim_first>\n");
   fprintf(stderr,"\t\t-use_rank_weight <weight the average sim with 1/rank>\n");
   fprintf(stderr,"\t\t-rank1 <only compare to first ranked, this will put w1=1 as well and override any setting of w1>\n");
   fprintf(stderr,"\t\t-normL <normalise S-score by length>\n");
   fprintf(stderr,"\t\t-ignore_res <file with residues to ignore (one on each line)>\n");
   fprintf(stderr,"\t\t-superimpose_all <use only one superposition>\n");
+  fprintf(stderr,"\t\t-w <weight file> for weighting the models in the structural comparison, for ProQ2clust these are the ProQ2 scores\n");
  //fprintf(stderr,"\t\t-f <fast mode, more sloppy heuristics for finding optimal sub alignments>\n");
   //fprintf(stderr,"\t\t-m <memory options\n");
   //fprintf(stderr,"\t\t    0 = re-read from disk\n");
