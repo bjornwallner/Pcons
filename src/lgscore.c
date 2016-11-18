@@ -1017,14 +1017,13 @@ void LGscore_res(char* file1,char* file2,lgscore *LG, double d0, double minsim,i
 	  //LGscore
 	  //  if ((pvalue <= maxpvalue) && (j>minatoms))
 #ifdef Sscore
-	  if ((score >= maxscore) && (j>minatoms)) 
+	  if ((score >= maxscore) && (j>minatoms))
 	    //printf("Sscore rule!\n");
 	    //	  if ((pvalue <= maxpvalue) && (j>minatoms)) {  
 #else
-	   if ((pvalue <= maxpvalue) && (j>minatoms))  
+	    if ((pvalue <= maxpvalue) && (j>minatoms))  
 #endif
-	     {
-	     //    { 
+	      { 
 	      if (fraction_flag)
 		{
 		  printf("GOOD1:\t%.2f\t%d\t%.1f\t%.1f\t%e\n",
@@ -1634,9 +1633,9 @@ void LGscore_res_pt(dyn_molecule *m1,dyn_molecule *m2,lgscore *LG, double d0, do
 		} 
 	    }
 #ifdef Sscore
-	  if ((score >= maxscore) && (j>minatoms)) {
+	  if ((score >= maxscore) && (j>minatoms)) 
 #else
-	  if ((pvalue <= maxpvalue) && (j>minatoms))
+	  if ((pvalue <= maxpvalue) && (j>minatoms)) 
 #endif
 	    {
 	      if (fraction_flag)
