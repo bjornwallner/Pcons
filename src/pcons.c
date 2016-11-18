@@ -849,6 +849,12 @@ int main(int argc,char *argv[])             /* Main routine */
 
 	    printf("REMARK Residues in the file: \'%s\' were ignored in the calculation\n",ignore_res_file);
 	  }
+#ifdef Sscore
+	  printf("REMARK Sscore was used for superposition\n");
+#else
+	  printf("REMARK LGscore was used for superposition\n");
+#endif
+	  
 	  if(caspoutput)
 	    {
 	      printf("REMARK Error estimate is CA-CA rms distance in Angstroms\n");
