@@ -1,8 +1,16 @@
 MAIN=lgscore.o molecule.o pcons.o src/nrutil.c src/jacobi.c src/eigsrt.c src/nets.c
 
-GOAL=Sscore
+#Uncomment to compile Sscore version 
+#GOAL=Sscore
+#SCORE=$(GOAL)
+#SSCORE =-D$(SCORE)
+
+#comment to compile Sscore version 
+GOAL=LGscore
 SCORE=$(GOAL)
-SSCORE =-D$(SCORE)
+SSCORE =
+##########
+
 Arch = $(shell hostname)
 #FLAG=-lm -O3 -funroll-loops -Isrc/ 
 #LFLAG=-lm -O1 -Isrc/ 

@@ -852,7 +852,7 @@ int main(int argc,char *argv[])             /* Main routine */
 #ifdef Sscore
 	  printf("REMARK Sscore was used for superposition\n");
 #else
-	  printf("REMARK LGscore was used for superposition (Pvalue based on Sscore)\n");
+	  printf("REMARK LGscore was used for superposition (Pvalue based on Sscore, pcons default)\n");
 #endif
 	  
 	  if(caspoutput)
