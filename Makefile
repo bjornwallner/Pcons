@@ -1,14 +1,17 @@
 MAIN=lgscore.o molecule.o pcons.o src/nrutil.c src/jacobi.c src/eigsrt.c src/nets.c
 
-
+GOAL=Sscore
+SCORE=$(GOAL)
+SSCORE =-D$(SCORE)
+Arch = $(shell hostname)
 #FLAG=-lm -O3 -funroll-loops -Isrc/ 
 #LFLAG=-lm -O1 -Isrc/ 
-LFLAG=-O3 -Isrc/ -fopenmp -std=c99 -static
+LFLAG=-O3 -Isrc/ -fopenmp -std=c99 -static $(SCORE)
 #LFLAG=-g -Isrc/ -fopenmp -std=c99
 #LFLAG=-g -lm -Isrc/ 
 
 MAIN: $(MAIN)
-	$(CC) $(LFLAG) -o bin/pcons $(MAIN) -lm
+	$(CC) $(LFLAG) -o bin/pcons.$(SCORE).$(Arch) $(MAIN) -lm
 
 
 pcons.o: src/pcons.c
