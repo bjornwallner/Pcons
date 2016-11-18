@@ -39,7 +39,7 @@ void       LGscore_res(char* file1,char* file2, lgscore *LG,double d0, double mi
 void       rms(dyn_molecule *m1,dyn_molecule *m2,lgscore *LG, double d0);
 void       LGscore_res_pt(dyn_molecule *m1,dyn_molecule *m2,lgscore *LG, double d0, double minsim,int L,double factor,int step);// ,int *ignore_res);
 double	   LG_pvalue(int N,double MS);
-double	   Levitt_Gerstein(molecule *m1,molecule *m2);
+double	   Levitt_Gerstein(molecule *m1,molecule *m2,double d0);
 double	   superimpose_molecules();
 double     LG_pvalueF(int N,double score);//added by Fang
 //int        read_molecules_ca();	/* Reads in molecules to be superimposed */
