@@ -6,7 +6,7 @@ SSCORE =-D$(SCORE)
 Arch = $(shell hostname)
 #FLAG=-lm -O3 -funroll-loops -Isrc/ 
 #LFLAG=-lm -O1 -Isrc/ 
-LFLAG=-O3 -Isrc/ -fopenmp -std=c99 -static $(SCORE)
+LFLAG=-O3 -Isrc/ -fopenmp -std=c99 -static $(SSCORE)
 #LFLAG=-g -Isrc/ -fopenmp -std=c99
 #LFLAG=-g -lm -Isrc/ 
 
