@@ -596,7 +596,7 @@ int main(int argc,char *argv[])             /* Main routine */
 	  if(verbose)
 	    printf("%d / %d\n",i+1,files+1);
 	  if(output_similarity_matrix)
-	    fprintf(fp,"%-40s ",filenames[i]);
+	    fprintf(fp,"%-100s ",filenames_with_path[i]);
 	  
 	  for(int j=i+1;j<files;j++)
 	    {
@@ -1040,10 +1040,10 @@ int main(int argc,char *argv[])             /* Main routine */
 	      //S_average[i]/=number_of_comparisons[i];
 	      //S_average[i]/=maxlen;
 	      if(google) {
-		printf("%s %5.3lf ",filenames[i],pcons_google[i]);
+		printf("%s %5.3lf ",filenames_with_path[i],pcons_google[i]);
 	      } else if(lgscoreoutput) {
 		//printf("%s %5.3lf %5.3lf %5.3lf",filenames[i],(1-w1)*LG_average[i]+w1*LG_average1[i],LG_average[i],LG_average1[i]);
-		printf("%s %5.3lf ",filenames[i],(1-w1)*LG_average[i]+w1*LG_average1[i]);
+		printf("%s %5.3lf ",filenames_with_path[i],(1-w1)*LG_average[i]+w1*LG_average1[i]);
 	      } else if(subdom) {
 		//printf("%s %5.3lf %5.3lf %5.3lf",filenames[i],(1-w1)*LG_average[i]+w1*LG_average1[i],LG_average[i],LG_average1[i]);
 		S=0;
@@ -1057,9 +1057,9 @@ int main(int argc,char *argv[])             /* Main routine */
 		    //  }
 		  }
 		S=S/number_of_comparisons[i];
-		printf("%s %5.3lf ",filenames[i],(double)S/(double)N);
+		printf("%s %5.3lf ",filenames_with_path[i],(double)S/(double)N);
 	      } else {
-		  printf("%s %5.3lf ",filenames[i],(1-w1)*S_average[i]+w1*S_average1[i]);
+		  printf("%s %5.3lf ",filenames_with_path[i],(1-w1)*S_average[i]+w1*S_average1[i]);
 	      }
 
 	      for(j=0;j<maxlen;j++)
