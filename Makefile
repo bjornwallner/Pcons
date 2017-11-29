@@ -2,14 +2,14 @@ MAIN=lgscore.o molecule.o pcons.o src/nrutil.c src/jacobi.c src/eigsrt.c src/net
 AE=lgscore.o molecule.o pconsAE.o src/nrutil.c src/jacobi.c src/eigsrt.c src/nets.c
 
 #Uncomment to compile Sscore version 
-#GOAL=Sscore
-#SCORE=$(GOAL)
-#SSCORE =-D$(SCORE)
+GOAL=Sscore
+SCORE=$(GOAL)
+SSCORE =-D$(SCORE)
 
 #comment to compile Sscore version 
-GOAL=LGscore
-SCORE=$(GOAL)
-SSCORE =
+#GOAL=LGscore
+#SCORE=$(GOAL)
+#SSCORE =
 ##########
 
 Arch = $(shell hostname)
