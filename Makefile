@@ -6,7 +6,7 @@ GOAL=Sscore
 SCORE=$(GOAL)
 SSCORE =-D$(SCORE)
 
-#comment to compile Sscore version 
+#comment to compile LGscore version 
 #GOAL=LGscore
 #SCORE=$(GOAL)
 #SSCORE =

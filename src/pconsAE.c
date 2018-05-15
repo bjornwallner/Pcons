@@ -1211,7 +1211,7 @@ int SameMethod(char *file1, char *file2)
     {
       //CASP naming convension ending with TS{rank}
       //OR AL{rank}.pdb
-      ident=0
+      ident=0;
 	
       for(i=0;i<5;i++)
 	{
