@@ -1186,7 +1186,52 @@ void usage()
 
 
 
+// THis is for CASP13 we only check the name of the first 5
+// characters.. (Quark and Zhang will still be different methods
+// though)
+
 int SameMethod(char *file1, char *file2)
+{
+  int ident=0;
+  int diffpos=0;
+  int i=0,j=0;
+  int len1,len2;
+  int dot_counter=0;
+  char method1[100];
+  char method2[100];
+
+  len1=strlen(file1);
+  len2=strlen(file2);
+
+
+
+
+  if(file1[len1-3]=='T' && file1[len1-2]=='S' && file2[len2-3]=='T' && file2[len2-2]=='S' ||
+     file1[len1-7]=='A' && file1[len1-6]=='L' & file1[len1-3]=='p' && file1[len1-2]=='d' && file1[len1-1]=='b' && file2[len2-7]=='A' && file2[len2-6]=='L' & file2[len2-3]=='p' && file2[len2-2]=='d' && file2[len2-1]=='b' )
+    {
+      //CASP naming convension ending with TS{rank}
+      //OR AL{rank}.pdb
+      ident=0
+	
+      for(i=0;i<5;i++)
+	{
+	  if(file1[i] == file2[i])
+	    {
+	      ident++;
+	    }
+	}
+      if(ident ==5)
+	 {
+	   return 1;
+	 }
+     }
+  else
+    {
+      return 0;
+    }
+}
+
+int SameMethod_OLD(char *file1, char *file2)
 {
   int ident=0;
   int diffpos=0;
