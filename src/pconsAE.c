@@ -1222,9 +1222,14 @@ int SameMethod(char *file1, char *file2)
 	}
       if(ident ==5)
 	 {
+	   // printf("%s same as %s  %d\n",file1,file2,ident);
 	   return 1;
 	 }
-     }
+      else{
+	//printf("%s NOT same as %s  %d\n",file1,file2,ident);
+	return 0;
+      }
+    }
   else
     {
       return 0;
