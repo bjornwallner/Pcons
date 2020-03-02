@@ -1,5 +1,6 @@
 MAIN=lgscore.o molecule.o pcons.o src/nrutil.c src/jacobi.c src/eigsrt.c src/nets.c
 AE=lgscore.o molecule.o pconsAE.o src/nrutil.c src/jacobi.c src/eigsrt.c src/nets.c
+PCONSD=lgscore.o molecule.o pconsd.o src/nrutil.c src/jacobi.c src/eigsrt.c src/nets.c
 
 #Uncomment to compile Sscore version 
 GOAL=Sscore
@@ -27,6 +28,9 @@ MAIN: $(MAIN)
 
 
 pcons.o: src/pcons.c
+	$(CC) $(LFLAG) $(CCFLAG) -c src/pcons.c -lm
+
+pconsd.o: src/pconsd.c
 	$(CC) $(LFLAG) $(CCFLAG) -c src/pcons.c -lm
 
 pconsAE.o: src/pconsAE.c

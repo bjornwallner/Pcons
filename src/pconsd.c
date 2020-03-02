@@ -621,11 +621,13 @@ int main(int argc,char *argv[])             /* Main routine */
 		    if(rank_weight1 > 0 || rank_weight2 > 0) {
 		      if(memorymode)
 			{
-			  LGscore_res_pt(&dm[i],&dm[j],LG,d0,minsim,L,factor,step); //,ignore_res);
+			  //LGscore_res_pt(&dm[i],&dm[j],LG,d0,minsim,L,factor,step); //,ignore_res);
+			  Dscore_res_pt(&dm[i],&dm[j],LG,d0,minsim,L,factor,step); //,ignore_res);
 			}
 		      else
 			{
-			  LGscore_res(filenames_with_path[i],filenames_with_path[j],LG,d0,minsim,L,factor,step);
+			  //LGscore_res(filenames_with_path[i],filenames_with_path[j],LG,d0,minsim,L,factor,step);
+			  Dscore_res(filenames_with_path[i],filenames_with_path[j],LG,d0,minsim,L,factor,step);
 			}
 		    
 		    //		  printf("%lf\n",LG[0].LGscore);
