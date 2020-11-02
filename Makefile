@@ -20,8 +20,8 @@ LFLAG=-O3 -Isrc/ -fopenmp -std=c99 -static $(SSCORE)
 #LFLAG=-g -Isrc/ -fopenmp -std=c99
 #LFLAG=-g -lm -Isrc/ 
 
-AE: $(AE)
-	$(CC) $(LFLAG) -o bin/pconsAE.$(SCORE).$(Arch) $(AE) -lm
+#AE: $(AE)#
+#	$(CC) $(LFLAG) -o bin/pconsAE.$(SCORE).$(Arch) $(AE) -lm
 
 MAIN: $(MAIN)
 	$(CC) $(LFLAG) -o bin/pcons.$(SCORE).$(Arch) $(MAIN) -lm
