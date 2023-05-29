@@ -744,7 +744,7 @@ double superimpose(char *file1,char *file2,char* file3,double minsim,int L, doub
 	//	 all_atom[0].atm[i].selected=TRUE;
 	//	 //printf("1: %-6s%5d %4s%1s%3s %1s%4d    %8.3f%8.3f%8.3f%6.2f%6.2f\n","ATOM",all_atom[0].atm[i].number,all_atom[0].atm[i].name," ",all_atom[0].atm[i].residue,all_atom[0].atm[i].chain,all_atom[0].atm[i].resnum,all_atom[0].atm[i].x,all_atom[0].atm[i].y,all_atom[0].atm[i].z,1.00,all_atom[0].atm[i].bfactor);
 	//       }
-	//     else
+//     else
 	//       {
 	//	 all_atom[0].atm[i].selected=FALSE;
 	//       }
@@ -769,7 +769,7 @@ double superimpose(char *file1,char *file2,char* file3,double minsim,int L, doub
 	// {
 	//   if(all_atom[0].atm[i].selected)
 	//     {
-	//	//printf("1: %-6s%5d %4s%1s%3s %1s%4d    %8.3f%8.3f%8.3f%6.2f%6.2f\n","ATOM",all_atom[0].atm[i].number,all_atom[0].atm[i].name," ",all_atom[0].atm[i].residue,all_atom[0].atm[i].chain,all_atom[0].atm[i].resnum,all_atom[0].atm[i].x,all_atom[0].atm[i].y,all_atom[0].atm[i].z,1.00,all_atom[0].atm[i].bfactor);
+	//	//printf("1: %-6s%5d %4s%1s%3s %1s%4d    %8.3f%8.3f%8.3f%6.2f%6.2f\n","ATOM",all_atom[0].atm[i].number,all_atom[0].atm[i].name," ",all_atom[0].atm[i].residue,all_atom[0].atm[i].chain,all_atom[0].atm[i].resnum,all_atom[0].atm[i].x,all_atom[0].atm[i].y,all_atom[0].atm[i].z,1.00,all_atom[0].atm[i].bminsim);
 	//  	   
 	//	//printf("2: %-6s%5d %4s%1s%3s %1s%4d    %8.3f%8.3f%8.3f%6.2f%6.2f\n","ATOM",all_atom[1].atm[i].number,all_atom[1].atm[i].name," ",all_atom[1].atm[i].residue,all_atom[1].atm[i].chain,all_atom[1].atm[i].resnum,all_atom[1].atm[i].x,all_atom[1].atm[i].y,all_atom[1].atm[i].z,1.00,all_atom[1].atm[i].bfactor);
 	//  
