@@ -128,22 +128,11 @@ double LGscore(char *file1,char *file2,double minsim,int L, double factor)
   //TETRA if(read_molecules_ca(&m[0])==0 && read_molecules_ca(&m[1])==0)
   if(read_molecules(&m[0],'c')==0 && read_molecules(&m[1],'c')==0)
     {
-      //printf("Hello\n");
-      //if(arglist)
-      //	{
-      //	  molecule m[2];
-      ///	  copymolecule(&m[0],&m_list[a]);
-      //  copymolecule(&m[1],&m_list[b]);
-      //	  printf("%-30s %-30s\t",m[0].filename,m[1].filename);
-      //	}
       length=max(m[0].atoms,m[1].atoms);
       check_molecules(&m[0],&m[1]); // this deletes some atoms
-      //printf("testing %d %d\n",m[0].atoms,m[1].atoms);
       atoms=m[0].atoms;
-	      
       for (i=0;i<m[0].atoms;i++){bestsizescore[i]=0;}
       for (i=0;i<m[0].atoms-L;i=i+1){
-	//printf("%d %d",i,L);
 	for (j=0;j<m[0].atoms;j++){ // deselect all atoms
 	  m[0].atm[j].selected=FALSE;
 	  m[1].atm[j].selected=FALSE;
@@ -180,7 +169,7 @@ double LGscore(char *file1,char *file2,double minsim,int L, double factor)
 		  }
 	      }
 	  }
-
+	  
 	  if(!m[0].atm[minpos].selected){
 	    j++;
 	  //printf("Selecting %d %f %d\n",minpos,minrmsd,j);
